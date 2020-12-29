@@ -1,35 +1,34 @@
 const data = require('../data');
+const pool = require('../db');
 
-function getLists() {
-    return data.lists;
+async function getLists() {
+
+    const [result,] = await pool.query('SELECT * FROM lists');
+    return result;
 }
 
-function getListsById(id) {
-    return data.lists.find((List) => List.id == id);
+async function getListsById(id) {
+    const [result,] = await pool.query('SELECT * FROM lists where id=?',[id]);
+    return result[0];
 }
 
-function deleteList(id) {
-    const idx = data.lists.findIndex((List) => List.id == id);
-    if(idx>-1){
-        const ele = data.lists.splice(idx,1);
-        return ele;
-    }
-    return 0;
+async function deleteList(id) {
+    const [result,] = await pool.query('DELETE * FROM lists where id=?',[id]);
+    return result;
 }
 
-function addList(name){
-    const list = {name, id:data.lists.length + 1};
-    data.lists.unshift(list);
-    console.log(list);
-    return list;
+async function addList(name){
+    const created_at = new Date();
+    const [result,] = await pool.query('INSERT INTO lists (name,user_id,created_at) values (?,?,?)',[name,1, created_at]);
+    //const list = await getListsById(result.insertId);
+    return {id: result.insertId, name, user_id:1, created_at};
+    //return list;
 }
 
-function updateList(id, name){
-    const idx = data.lists.findIndex(List => List.id == id);
-    if(idx !== -1){
-        data.lists[idx] = {...data.lists[idx], ...name};
-        return data.lists[idx];
-    }
+async function updateList(id, name){
+    const updated_at = new Date();
+    const [result,] = await pool.query('UPDATE lists SET name=?, updated_at=? where id=?',[name,updated_at,id]);
+    return {id, name, user_id:1, updated_at};
 }
 
 module.exports = {
