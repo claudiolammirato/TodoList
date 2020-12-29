@@ -17,8 +17,24 @@ function deleteTodo(id) {
     return 0;
 }
 
+function addTodo({todo,completed,list}){
+    const newtodo = {todo,completed,list}
+    data.todos.unshift(newtodo);
+    return newtodo;
+}
+
+function updateTodo(id, newTodo){
+    const idx = data.todos.findIndex(todo => todo.id == id);
+    if(idx !== -1){
+        data.todos[idx] = {...data.todos[idx], ...newTodo};
+        return data.todos[idx];
+    }
+}
+
 module.exports = {
     getTodos,
     getTodosById,
-    deleteTodo
+    deleteTodo,
+    addTodo,
+    updateTodo
 }
